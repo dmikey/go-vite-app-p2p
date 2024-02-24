@@ -1,6 +1,6 @@
 # go-vite-app
 
-Starter repo to build small, portable, rich apps, which are by default Web Apps. 
+Starter repo to build small, portable, rich apps, which are by default Web Apps. That comes with all the bolts to distribute via docker, bare metal, and inside native app shims.
 
 This repo contains a starter base, which will help create a React/Typescript/Vite Front End, that is powered by a Golang backend. Tied together using google `proto3`. 
 
@@ -52,6 +52,17 @@ Usage of ./myapp:
         Run in headless mode without opening the browser
   -port int
         Run in headless mode without opening the browser
+```
+## try it
+
+Grab a binary for your system here
+
+https://github.com/dmikey/go-vite-app/releases/tag/latest
+
+Give docker a spin 
+
+```bash
+docker run -p 8080:8080 ghcr.io/dmikey/go-vite-app:v0.0.3
 ```
 
 ## app containers
