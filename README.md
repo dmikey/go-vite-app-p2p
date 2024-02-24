@@ -17,6 +17,11 @@ Starts a development server.
 * Development Server http://localhost:8080
 
 
+* Install protoc-js 
+```
+npm install -g protoc-gen-js
+```
+
 # production
 
 `make build` will produce a single executible containing the `vite` app, with the golang backed api server.

@@ -19,4 +19,5 @@ build:
 proto-gen:
 	@echo "Generating Go code from .proto files..."
 	@protoc --go_out=paths=source_relative:./server --go_opt=paths=source_relative ./proto/*.proto
+	@protoc --proto_path=./proto --js_out=import_style=es6,binary:./client/src ./proto/*.proto
 	@echo "Proto compilation complete."
