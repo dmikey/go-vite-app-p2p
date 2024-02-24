@@ -1,5 +1,3 @@
-name: Build and Release Binaries on Github
-
 on:
   release:
     types: [created]
