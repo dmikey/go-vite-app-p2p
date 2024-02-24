@@ -1,11 +1,25 @@
 # go-vite
 
-Starter repo to build small, portable, rich apps.
+Starter repo to build small, portable, rich apps, which are by default Web Apps. 
+
+This repo contains a starter base, which will help create a React/Typescript/Vite Front End, that is powered by a Golang backend. Tied together using google `proto3`. 
+
+You can simply distribute your binary application, which will contain a front end, and the webserver to power it together. It wil automatically open a user's Web Browser as it's primary UI Window.
+
+Using `--headless` and `--port` you can specify some options, to transport or build and distribute this as a working web app where you need it.
+
+In addition there are (will be) a number of associated "containers" which all follow the same RPC interface, and allow you to distribute ✌ Native ✌ apps, so users get the easy of ownership with your product.
+
+# dev
+
+To build the basics : 
 
 * go 1.21
 * node 1.18
 
-# dev
+To build more : 
+
+* Swift for OSX 14+
 
 ```bash
 make dev
