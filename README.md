@@ -39,3 +39,12 @@ Usage of ./myapp:
   -port int
         Run in headless mode without opening the browser
 ```
+
+## app containers
+
+This repo comes with some projects and developer workflows to help distribute ✌ Native ✌ apps. 
+
+* SwiftUI (available)
+* Windows (coming)
+* GTK (coming)
+* QT (coming)
