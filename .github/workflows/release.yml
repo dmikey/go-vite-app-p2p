@@ -37,8 +37,8 @@ jobs:
         uses: thedoctor0/zip-release@0.7.1
         with:
           type: "tar"
-          directory: dist/
-          filename: ../myapp-${{ matrix.goos }}.${{ matrix.goarch }}.tar.gz
+          directory: .
+          filename: myapp-${{ matrix.goos }}.${{ matrix.goarch }}.tar.gz
           path: myapp*
       - name: Get release
         id: get_release
