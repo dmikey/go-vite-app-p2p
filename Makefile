@@ -1,4 +1,4 @@
-.PHONY: dev build proto
+.PHONY: dev build proto build-app
 
 dev:
 	@echo "Starting development environment..."
@@ -13,7 +13,7 @@ build:
 	@echo "Building client..."
 	@cd client && yarn build
 	@echo "Building Go server for production..."
-	@cd server && go build -o ../myapp -tags !dev .
+	@cd server && go build -o ../myapp -tags !dev,!app .
 	@echo "Build complete. Execute ./myapp to run the server."
 
 proto-gen:
