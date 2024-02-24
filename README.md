@@ -1,4 +1,4 @@
-# go-vite
+# go-vite-app
 
 Starter repo to build small, portable, rich apps, which are by default Web Apps. 
 
