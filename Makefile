@@ -1,4 +1,4 @@
-.PHONY: dev build proto build-app
+.PHONY: dev build proto build-osx
 
 dev:
 	@echo "Starting development environment..."
@@ -14,6 +14,13 @@ build:
 	@cd client && yarn build
 	@echo "Building Go server for production..."
 	@cd server && go build -o ../myapp -tags !dev,!app .
+	@echo "Build complete. Execute ./myapp to run the server."
+
+build-osx:
+	@echo "Building OSX Shell..."
+	@echo "Building Go server for production..."
+	@cd server && go build -o ../myapp -tags !dev,!app .
+	@cd ./containers/osx/SwiftFrame && xcodebuild -project SwiftFrame.xcodeproj -configuration Debug
 	@echo "Build complete. Execute ./myapp to run the server."
 
 proto-gen:
