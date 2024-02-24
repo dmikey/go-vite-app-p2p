@@ -9,8 +9,6 @@ import (
 )
 
 func main() {
-	// Serve files directly from the filesystem in development.
-	http.Handle("/", http.FileServer(http.Dir("assets/")))
 
     // Register API routes.
 	RegisterAPIRoutes()
