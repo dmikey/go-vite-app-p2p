@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package main;
+option go_package = "github.com/dmikey/go-vite-app/";
+
+// A simple message representing a person
+message Person {
+  string name = 1; // The name of the person
+  int32 id = 2; // Unique ID number for the person
+  string email = 3; // Email address of the person
+
+  // An enum to represent the person's phone type
+  enum PhoneType {
+    MOBILE = 0;
+    HOME = 1;
+    WORK = 2;
+  }
+
+  // A nested message representing a phone number
+  message PhoneNumber {
+    string number = 1; // The phone number
+    PhoneType type = 2; // The type of phone
+  }
+
+  // Repeated fields can contain 0 or more of the specified message (like an array)
+  repeated PhoneNumber phones = 4;
+}
