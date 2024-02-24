@@ -22,6 +22,10 @@ jobs:
         goos: [darwin, linux]
         goarch: [amd64, arm64]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
     steps:
       - name: set goos
         run: echo "GOOS=${{ matrix.goos }}"
