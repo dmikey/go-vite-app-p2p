@@ -34,6 +34,3 @@ Usage of ./myapp:
   -port int
         Run in headless mode without opening the browser
 ```
-
-
-
