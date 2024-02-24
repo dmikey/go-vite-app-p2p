@@ -5,6 +5,7 @@ package main
 
 import (
 	"embed"
+	"flag"
 	"fmt"
 	"io/fs"
 	"log"
@@ -17,6 +18,15 @@ import (
 
 //go:embed assets/*
 var embeddedFiles embed.FS
+var headless bool
+var port int
+
+func init() {
+	// Define the headless flag
+	flag.BoolVar(&headless, "headless", false, "Run in headless mode without opening the browser")
+	flag.IntVar(&port, "port", 0, "Run in headless mode without opening the browser")
+	flag.Parse()
+}
 
 func main() {
 	assets, err := fs.Sub(embeddedFiles, "assets")
@@ -25,16 +35,15 @@ func main() {
 		return
 	}
 
+	// Get the port the server is listening on.
 	// Listen on a random port.
-	listener, err := net.Listen("tcp", "localhost:0")
+	listenAddr := fmt.Sprintf("localhost:%d", port)
+	listener, err := net.Listen("tcp", listenAddr)
 	if err != nil {
 		log.Fatalf("Failed to listen on a port: %v", err)
 	}
 	defer listener.Close()
 
-	
-	
-	// Get the port the server is listening on.
 	port := listener.Addr().(*net.TCPAddr).Port
 	serverURL := fmt.Sprintf("http://localhost:%d", port)
 	fmt.Printf("Production server listening on %s\n", serverURL)
@@ -45,12 +54,13 @@ func main() {
     // Register API routes.
 	RegisterAPIRoutes()
 
-	fmt.Println("Opening browser")
-
-	go func() {
-		waitForServer(serverURL)
-		openbrowser(serverURL)
-	}()
+	if !headless {
+		fmt.Println("Opening browser")
+		go func() {
+			waitForServer(serverURL)
+			openbrowser(serverURL)
+		}()
+	}
 
 	if err := http.Serve(listener, nil); err != nil {
 		fmt.Println(err)
