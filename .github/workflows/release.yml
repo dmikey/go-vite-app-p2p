@@ -19,7 +19,7 @@ jobs:
   release:
     strategy:
       matrix:
-        goos: [darwin, linux, windows]
+        goos: [darwin, linux]
         goarch: [amd64, arm64]
     runs-on: ubuntu-latest
     steps:
