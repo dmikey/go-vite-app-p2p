@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 name: Release MyApp
-# jobs:
+  jobs:
 #   delete_latest:
 #     runs-on: ubuntu-latest
 #     steps:
