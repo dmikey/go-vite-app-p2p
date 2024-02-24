@@ -4,18 +4,18 @@ on:
   workflow_dispatch:
 
 name: Release MyApp
-jobs:
-  delete_latest:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Delete the "latest" Release
-        uses: dev-drprasad/delete-tag-and-release@v0.2.1
-        with:
-          tag_name: latest
-          delete_release: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  blockless_networking_release:
+# jobs:
+#   delete_latest:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Delete the "latest" Release
+#         uses: dev-drprasad/delete-tag-and-release@v0.2.1
+#         with:
+#           tag_name: latest
+#           delete_release: true
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  release:
     needs: delete_latest
     strategy:
       matrix:
