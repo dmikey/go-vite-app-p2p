@@ -4,7 +4,7 @@ dev:
 	@echo "Starting development environment..."
 	@{ \
 	trap 'trap - SIGTERM && kill -- -$$' SIGINT SIGTERM EXIT; \
-	cd client && yarn dev & \
+	cd client && yarn dev > /dev/null & \
 	cd server && go run -tags dev . & \
 	wait; \
 	}
