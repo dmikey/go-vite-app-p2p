@@ -5,7 +5,7 @@ Build small, portable, rich apps.
 * go 1.21
 * node 1.18
 
-# usage
+# dev
 
 ```bash
 make dev
@@ -24,5 +24,16 @@ Starts a development server.
 ```bash
 ./myapp
 ```
+
+## build
+
+```
+Usage of ./myapp:
+  -headless
+        Run in headless mode without opening the browser
+  -port int
+        Run in headless mode without opening the browser
+```
+
 
 
