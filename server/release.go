@@ -37,7 +37,12 @@ func main() {
 
 	// Get the port the server is listening on.
 	// Listen on a random port.
-	listenAddr := fmt.Sprintf("localhost:%d", port)
+	listenHost := "localhost"
+	if(headless) {
+		listenHost = "0.0.0.0"
+	}
+
+	listenAddr := fmt.Sprintf("%s:%d", listenHost, port)
 	listener, err := net.Listen("tcp", listenAddr)
 	if err != nil {
 		log.Fatalf("Failed to listen on a port: %v", err)

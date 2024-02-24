@@ -1,4 +1,4 @@
-.PHONY: dev build proto build-osx
+.PHONY: dev build proto build-osx build-client
 
 dev:
 	@echo "Starting development environment..."
@@ -9,14 +9,25 @@ dev:
 	wait; \
 	}
 
+build-client:
+	@echo "Building client..."
+	@cd client && yarn && yarn build
+
+build-server:
+	@echo "Building Go server for production..."
+	@cd server && go build -o ../myapp -tags !dev,!app .
+	@echo "Build complete. Execute ./myapp to run the server."
+
 build:
 	@echo "Building client..."
-	@cd client && yarn build
+	@cd client && yarn && yarn build
 	@echo "Building Go server for production..."
 	@cd server && go build -o ../myapp -tags !dev,!app .
 	@echo "Build complete. Execute ./myapp to run the server."
 
 build-osx:
+	@echo "Building client..."
+	@cd client && yarn && yarn build
 	@echo "Building OSX Shell..."
 	@echo "Building Go server for production..."
 	@cd server && go build -o ../myapp -tags !dev,!app .
