@@ -1,6 +1,6 @@
 # go-vite
 
-Build small, portable, rich apps.
+Starter repo to build small, portable, rich apps.
 
 * go 1.21
 * node 1.18
