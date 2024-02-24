@@ -4,7 +4,7 @@ Starter repo to build small, portable, rich apps, which are by default Web Apps.
 
 This repo contains a starter base, which will help create a React/Typescript/Vite Front End, that is powered by a Golang backend. Tied together using google `proto3`. 
 
-You can simply distribute your binary application, which will contain a front end, and the webserver to power it together. It wil automatically open a user's Web Browser as it's primary UI Window.
+You can simply distribute your binary application, which will contain a front end, and the webserver to power it together. It will automatically open a user's Web Browser as it's primary UI Window.
 
 Using `--headless` and `--port` you can specify some options, to transport or build and distribute this as a working web app where you need it.
 
