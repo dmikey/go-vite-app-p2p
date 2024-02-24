@@ -4,7 +4,8 @@ on:
   workflow_dispatch:
 
 name: Release MyApp
-  jobs:
+
+jobs:
 #   delete_latest:
 #     runs-on: ubuntu-latest
 #     steps:
@@ -16,7 +17,6 @@ name: Release MyApp
 #         env:
 #           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   release:
-    needs: delete_latest
     strategy:
       matrix:
         goos: [darwin, linux, windows]
