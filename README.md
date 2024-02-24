@@ -27,7 +27,7 @@ make dev
 
 Starts a development server.
 
-* Vite Server http://localhost:5173/ (messages swallowed for clean)
+* Vite Server http://localhost:5173/ (messages swallowed for cleaner ux)
 * Development Server http://localhost:8080
 
 
