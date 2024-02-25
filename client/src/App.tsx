@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 import {
 	Menubar,
@@ -24,11 +22,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import "./App.css";
-import { Home } from "lucide-react";
 
 function App() {
-	const [count, setCount] = useState(0);
-
 	return (
 		<>
 			<div className="app-container">
