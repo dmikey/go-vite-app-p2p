@@ -3,3 +3,4 @@ node_modules/
 myapp
 assets/
 build/
+__debug*

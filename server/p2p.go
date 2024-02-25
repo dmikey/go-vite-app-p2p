@@ -2,21 +2,16 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
 
 	"github.com/cockroachdb/pebble"
-	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
-	"github.com/ziflex/lecho/v3"
 
 	"github.com/multiformats/go-multiaddr"
 
-	"github.com/blocklessnetwork/b7s/api"
 	"github.com/blocklessnetwork/b7s/config"
 	"github.com/blocklessnetwork/b7s/fstore"
 	"github.com/blocklessnetwork/b7s/host"
@@ -39,25 +34,15 @@ func (p *pebbleNoopLogger) Fatalf(_ string, _ ...any) {}
 // 	os.Exit(run())
 // }
 
-func run() int {
+func runP2P(log zerolog.Logger, cfg config.Config) int {
 
 	// Signal catching for clean shutdown.
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt)
 
-	// Initialize logging.
-	log := zerolog.New(os.Stderr).With().Timestamp().Logger().Level(zerolog.DebugLevel)
-
-	// Parse CLI flags and validate that the configuration is valid.
-	var cfg config.Config
-
-	// Set log level.
-	level, err := zerolog.ParseLevel(cfg.Log.Level)
-	if err != nil {
-		log.Error().Err(err).Str("level", cfg.Log.Level).Msg("could not parse log level")
-		return failure
-	}
-	log = log.Level(level)
+	cfg.PeerDatabasePath="/tmp/myapp-peers"
+	cfg.FunctionDatabasePath="/tmp/myapp-functions"
+	cfg.Role = blockless.HeadNodeLabel
 
 	// Determine node role.
 	role := blockless.HeadNode
@@ -107,6 +92,7 @@ func run() int {
 		host.WithWebsocket(cfg.Host.Websocket),
 		host.WithWebsocketPort(cfg.Host.WebsocketPort),
 	)
+
 	if err != nil {
 		log.Error().Err(err).Str("key", cfg.Host.PrivateKey).Msg("could not create host")
 		return failure
@@ -170,65 +156,6 @@ func run() int {
 		}
 
 		log.Info().Msg("Blockless Node stopped")
-	}()
-
-	// If we're a head node - start the REST API.
-	if role == blockless.HeadNode {
-
-		if cfg.API == "" {
-			log.Error().Err(err).Msg("REST API address is required")
-			return failure
-		}
-
-		// Create echo server and iniialize logging.
-		server := echo.New()
-		server.HideBanner = true
-		server.HidePort = true
-
-		elog := lecho.From(log)
-		server.Logger = elog
-		server.Use(lecho.Middleware(lecho.Config{Logger: elog}))
-
-		// Create an API handler.
-		api := api.New(log, node)
-
-		// Set endpoint handlers.
-		server.GET("/api/v1/health", api.Health)
-		server.POST("/api/v1/functions/execute", createExecutor(*api))
-		server.POST("/api/v1/functions/install", api.Install)
-		server.POST("/api/v1/functions/requests/result", api.ExecutionResult)
-
-		// Start API in a separate goroutine.
-		go func() {
-
-			log.Info().Str("port", cfg.API).Msg("Node API starting")
-			err := server.Start(cfg.API)
-			if err != nil && !errors.Is(err, http.ErrServerClosed) {
-				log.Warn().Err(err).Msg("Node API failed")
-				close(failed)
-			} else {
-				close(done)
-			}
-
-			log.Info().Msg("Node API stopped")
-		}()
-	}
-
-	select {
-	case <-sig:
-		log.Info().Msg("Blockless AVS stopping")
-	case <-done:
-		log.Info().Msg("Blockless AVS done")
-	case <-failed:
-		log.Info().Msg("Blockless AVS aborted")
-		return failure
-	}
-
-	// If we receive a second interrupt signal, exit immediately.
-	go func() {
-		<-sig
-		log.Warn().Msg("forcing exit")
-		os.Exit(1)
 	}()
 
 	return success

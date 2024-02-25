@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 //go:embed assets/*
@@ -37,6 +38,9 @@ func init() {
 }
 
 func main() {
+	cfg := parseFlags()
+	sig := make(chan os.Signal, 1)
+
 	logger.Info().Bool("headless mode", !headless).Msg("the server is starting")
 
 	assets, err := fs.Sub(embeddedFiles, "assets")
@@ -69,6 +73,9 @@ func main() {
     // Register API routes.
 	RegisterAPIRoutes()
 
+	// Boot P2P Network
+	runP2P(logger, *cfg)
+
 	if !headless {
 		logger.Info().Msg("Opening browser")
 		go func() {
@@ -80,6 +87,25 @@ func main() {
 	if err := http.Serve(listener, nil); err != nil {
 		logger.Fatal().Err(err).Msg("Web server failed to start")
 	}
+
+	done := make(chan struct{})
+	failed := make(chan struct{})
+
+	select {
+	case <-sig:
+		log.Info().Msg("Blockless AVS stopping")
+	case <-done:
+		log.Info().Msg("Blockless AVS done")
+	case <-failed:
+		log.Info().Msg("Blockless AVS aborted")
+	}
+
+	// If we receive a second interrupt signal, exit immediately.
+	go func() {
+		<-sig
+		log.Warn().Msg("forcing exit")
+		os.Exit(1)
+	}()
 }
 
 func waitForServer(url string) {
