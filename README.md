@@ -1,14 +1,15 @@
-# go-vite-app
-### EXPERIMENTAL
-Starter repo to build small, portable, rich apps, which are by default Web Apps. That comes with all the bolts to distribute via docker, bare metal, and inside native app shims.
+# blockless powered vite app
 
-This repo contains a starter base, which will help create a React/Typescript/Vite Front End, that is powered by a Golang backend. Tied together using google `proto3`. 
+dApps on steroids.
 
-You can simply distribute your binary application, which will contain a front end, and the webserver to power it together. It will automatically open a user's Web Browser as it's primary UI Window.
+nnApplications should be easy to build. Users should be able to power a network by using a dApp. Operators should be able to launch AVS' with ease. 
 
-Using `--headless` and `--port` you can specify some options, to transport or build and distribute this as a working web app where you need it.
+This repo is a radical change on building dApplications with Network Neutral Principals. 
 
-In addition there are (will be) a number of associated "containers" which all follow the same RPC interface, and allow you to distribute ✌ Native ✌ apps, so users get the easy of ownership with your product.
+What the f' is this?
+
+* Vite Powered Front End using Blockless Web Workers
+* Golang Powered Rest Server with a P2P Server Provider Network built in.
 
 # dev
 
