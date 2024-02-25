@@ -62,7 +62,7 @@ https://github.com/dmikey/go-vite-app/releases/tag/latest
 Give docker a spin 
 
 ```bash
-docker run -p 8080:8080 ghcr.io/dmikey/go-vite-app:v0.0.3
+docker run -p 8080:8080 ghcr.io/dmikey/go-vite-app:v0.0.4
 ```
 
 ## app containers
