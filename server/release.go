@@ -8,30 +8,40 @@ import (
 	"flag"
 	"fmt"
 	"io/fs"
-	"log"
 	"net"
 	"net/http"
+	"os"
 	"os/exec"
 	"runtime"
 	"time"
+
+	"github.com/rs/zerolog"
 )
 
 //go:embed assets/*
 var embeddedFiles embed.FS
 var headless bool
 var port int
+var logger zerolog.Logger
 
 func init() {
 	// Define the headless flag
 	flag.BoolVar(&headless, "headless", false, "Run in headless mode without opening the browser")
 	flag.IntVar(&port, "port", 0, "Run in headless mode without opening the browser")
 	flag.Parse()
+
+	logger = zerolog.New(os.Stderr).With().Timestamp().Logger().Level(zerolog.DebugLevel)
+	if(!headless) {
+		logger = logger.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	}
 }
 
 func main() {
+	logger.Info().Bool("headless mode", !headless).Msg("the server is starting")
+
 	assets, err := fs.Sub(embeddedFiles, "assets")
 	if err != nil {
-		fmt.Println("Failed to locate embedded assets:", err)
+		logger.Info().Err(err).Msg("Failed to locate embedded assets")
 		return
 	}
 
@@ -45,13 +55,13 @@ func main() {
 	listenAddr := fmt.Sprintf("%s:%d", listenHost, port)
 	listener, err := net.Listen("tcp", listenAddr)
 	if err != nil {
-		log.Fatalf("Failed to listen on a port: %v", err)
+		logger.Fatal().Err(err).Msg("Failed to listen on a port: %v")
 	}
 	defer listener.Close()
 
 	port := listener.Addr().(*net.TCPAddr).Port
 	serverURL := fmt.Sprintf("http://localhost:%d", port)
-	fmt.Printf("Production server listening on %s\n", serverURL)
+	logger.Info().Str("serverUrl", serverURL).Msgf("Production server listening on %s", serverURL)
 
 	// Use the http.FileServer to serve the embedded assets.
 	http.Handle("/", http.FileServer(http.FS(assets)))
@@ -60,7 +70,7 @@ func main() {
 	RegisterAPIRoutes()
 
 	if !headless {
-		fmt.Println("Opening browser")
+		logger.Info().Msg("Opening browser")
 		go func() {
 			waitForServer(serverURL)
 			openbrowser(serverURL)
@@ -68,7 +78,7 @@ func main() {
 	}
 
 	if err := http.Serve(listener, nil); err != nil {
-		fmt.Println(err)
+		logger.Fatal().Err(err).Msg("Web server failed to start")
 	}
 }
 
@@ -78,7 +88,7 @@ func waitForServer(url string) {
 		resp, err := http.Get(url)
 		if err == nil && resp.StatusCode == http.StatusOK {
 			resp.Body.Close() // Don't forget to close the response body.
-			fmt.Println("App is Running. CTRL+C to quit.")
+			logger.Info().Msg("App is Running. CTRL+C to quit.")
 			return
 		}
 		// Close the unsuccessful response body to avoid leaking resources.
@@ -104,7 +114,7 @@ func openbrowser(url string) {
 		err = fmt.Errorf("unsupported platform")
 	}
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 }
