@@ -65,14 +65,3 @@ Give docker a spin
 ```bash
 docker run -p 8080:8080 ghcr.io/dmikey/go-vite-app:v0.0.4
 ```
-
-## app containers
-
-This repo comes with some projects and developer workflows to help distribute ✌ Native ✌ apps. 
-
-* OSX via Swift UI (available)
-* iOS via Swift UI (coming)
-* Android via Kotlin (coming)
-* Windows (coming)
-* GTK (coming)
-* QT (coming)
