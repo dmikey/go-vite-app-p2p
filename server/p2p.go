@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
-	"os/signal"
 	"path/filepath"
 
 	"github.com/cockroachdb/pebble"
@@ -34,11 +32,7 @@ func (p *pebbleNoopLogger) Fatalf(_ string, _ ...any) {}
 // 	os.Exit(run())
 // }
 
-func runP2P(log zerolog.Logger, cfg config.Config) int {
-
-	// Signal catching for clean shutdown.
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, os.Interrupt)
+func runP2P(ctx context.Context, log zerolog.Logger, cfg config.Config, done chan struct{}, failed chan struct{}, pdb *pebble.DB, fdb *pebble.DB) int {
 
 	cfg.PeerDatabasePath="/tmp/myapp-peers"
 	cfg.FunctionDatabasePath="/tmp/myapp-functions"
@@ -55,13 +49,6 @@ func runP2P(log zerolog.Logger, cfg config.Config) int {
 	}
 	cfg.Workspace = workspace
 
-	// Open the pebble peer database.
-	pdb, err := pebble.Open(cfg.PeerDatabasePath, &pebble.Options{Logger: &pebbleNoopLogger{}})
-	if err != nil {
-		log.Error().Err(err).Str("db", cfg.PeerDatabasePath).Msg("could not open pebble peer database")
-		return failure
-	}
-	defer pdb.Close()
 
 	// Create a new store.
 	pstore := store.New(pdb)
@@ -113,13 +100,7 @@ func runP2P(log zerolog.Logger, cfg config.Config) int {
 		node.WithAttributeLoading(cfg.LoadAttributes),
 	}
 
-	// Open the pebble function database.
-	fdb, err := pebble.Open(cfg.FunctionDatabasePath, &pebble.Options{Logger: &pebbleNoopLogger{}})
-	if err != nil {
-		log.Error().Err(err).Str("db", cfg.FunctionDatabasePath).Msg("could not open pebble function database")
-		return failure
-	}
-	defer fdb.Close()
+
 
 	functionStore := store.New(fdb)
 
@@ -132,13 +113,6 @@ func runP2P(log zerolog.Logger, cfg config.Config) int {
 		log.Error().Err(err).Msg("could not create node")
 		return failure
 	}
-
-	// Create the main context.
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	done := make(chan struct{})
-	failed := make(chan struct{})
 
 	// Start node main loop in a separate goroutine.
 	go func() {

@@ -4,7 +4,9 @@
 package main
 
 import (
+	"context"
 	"embed"
+	"errors"
 	"flag"
 	"fmt"
 	"io/fs"
@@ -12,9 +14,11 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"os/signal"
 	"runtime"
 	"time"
 
+	"github.com/cockroachdb/pebble"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -39,7 +43,11 @@ func init() {
 
 func main() {
 	cfg := parseFlags()
+	// Signal catching for clean shutdown.
 	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, os.Interrupt)
+	done := make(chan struct{})
+	failed := make(chan struct{})
 
 	logger.Info().Bool("headless mode", !headless).Msg("the server is starting")
 
@@ -73,8 +81,26 @@ func main() {
     // Register API routes.
 	RegisterAPIRoutes()
 
+	// Create the main context for p2p
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Open the pebble peer database.
+	pdb, err := pebble.Open(cfg.PeerDatabasePath, &pebble.Options{Logger: &pebbleNoopLogger{}})
+	if err != nil {
+		log.Error().Err(err).Str("db", cfg.PeerDatabasePath).Msg("could not open pebble peer database")
+	}
+	defer pdb.Close()
+
+	// Open the pebble function database.
+	fdb, err := pebble.Open(cfg.FunctionDatabasePath, &pebble.Options{Logger: &pebbleNoopLogger{}})
+	if err != nil {
+		log.Error().Err(err).Str("db", cfg.FunctionDatabasePath).Msg("could not open pebble function database")
+	}
+	defer fdb.Close()
+
 	// Boot P2P Network
-	runP2P(logger, *cfg)
+	runP2P(ctx, logger, *cfg, done, failed, pdb, fdb)
 
 	if !headless {
 		logger.Info().Msg("Opening browser")
@@ -84,26 +110,29 @@ func main() {
 		}()
 	}
 
-	if err := http.Serve(listener, nil); err != nil {
-		logger.Fatal().Err(err).Msg("Web server failed to start")
-	}
-
-	done := make(chan struct{})
-	failed := make(chan struct{})
+	// Start API in a separate goroutine.
+	go func() {
+		logger.Info().Str("port", cfg.API).Msg("Node API starting")
+		err := http.Serve(listener, nil)
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			logger.Warn().Err(err).Msg("Closed Server")
+			close(failed)
+		}
+	}()
 
 	select {
-	case <-sig:
-		log.Info().Msg("Blockless AVS stopping")
-	case <-done:
-		log.Info().Msg("Blockless AVS done")
-	case <-failed:
-		log.Info().Msg("Blockless AVS aborted")
+		case <-sig:
+			logger.Info().Msg("Blockless AVS stopping")
+		case <-done:
+			logger.Info().Msg("Blockless AVS done")
+		case <-failed:
+			logger.Info().Msg("Blockless AVS aborted")
 	}
 
 	// If we receive a second interrupt signal, exit immediately.
 	go func() {
 		<-sig
-		log.Warn().Msg("forcing exit")
+		logger.Warn().Msg("forcing exit")
 		os.Exit(1)
 	}()
 }
