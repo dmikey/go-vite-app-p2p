@@ -52,15 +52,17 @@ Usage of ./myapp:
   -headless
         Run in headless mode without opening the browser
   -port int
-        Run in headless mode without opening the browser
+        Provide a listenable port e.g. 8080
 ```
 ## try it
 
-Grab a binary for your system here
+two ways to join the reference network!
+
+1. Grab a binary for your system here
 
 https://github.com/dmikey/go-vite-app/releases/tag/latest
 
-Give docker a spin 
+2. Give a docker a spin! 
 
 ```bash
 docker run -p 8080:8080 ghcr.io/dmikey/go-vite-app:v0.0.4
