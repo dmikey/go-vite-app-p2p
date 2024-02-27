@@ -7,7 +7,6 @@ import (
 	"context"
 	"embed"
 	"errors"
-	"flag"
 	"fmt"
 	"io/fs"
 	"net"
@@ -18,6 +17,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/blocklessnetwork/b7s/config"
 	"github.com/cockroachdb/pebble"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -25,31 +25,32 @@ import (
 
 //go:embed assets/*
 var embeddedFiles embed.FS
-var headless bool
-var port int
 var logger zerolog.Logger
+var cfg *Cfg
+
+type Cfg struct {
+	config.Config
+	headless bool
+}
 
 func init() {
 	// Define the headless flag
-	flag.BoolVar(&headless, "headless", false, "Run in headless mode without opening the browser")
-	flag.IntVar(&port, "port", 0, "Run in headless mode without opening the browser")
-	flag.Parse()
+	cfg = parseFlags()
 
 	logger = zerolog.New(os.Stderr).With().Timestamp().Logger().Level(zerolog.DebugLevel)
-	if(!headless) {
+	if(!cfg.headless) {
 		logger = logger.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 }
 
 func main() {
-	cfg := parseFlags()
 	// Signal catching for clean shutdown.
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt)
 	done := make(chan struct{})
 	failed := make(chan struct{})
 
-	logger.Info().Bool("headless mode", !headless).Msg("the server is starting")
+	logger.Info().Bool("headless mode", !cfg.headless).Msg("the server is starting")
 
 	assets, err := fs.Sub(embeddedFiles, "assets")
 	if err != nil {
@@ -60,11 +61,11 @@ func main() {
 	// Get the port the server is listening on.
 	// Listen on a random port.
 	listenHost := "localhost"
-	if(headless) {
+	if(cfg.headless) {
 		listenHost = "0.0.0.0"
 	}
 
-	listenAddr := fmt.Sprintf("%s:%d", listenHost, port)
+	listenAddr := fmt.Sprintf("%s:%s", listenHost, cfg.API)
 	listener, err := net.Listen("tcp", listenAddr)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to listen on a port: %v")
@@ -72,7 +73,7 @@ func main() {
 	defer listener.Close()
 
 	port := listener.Addr().(*net.TCPAddr).Port
-	serverURL := fmt.Sprintf("http://localhost:%d", port)
+	serverURL := fmt.Sprintf("http://localhost:%s", fmt.Sprint(port))
 	logger.Info().Str("serverUrl", serverURL).Msgf("Production server listening on %s", serverURL)
 
 	// Use the http.FileServer to serve the embedded assets.
@@ -102,7 +103,7 @@ func main() {
 	// Boot P2P Network
 	runP2P(ctx, logger, *cfg, done, failed, pdb, fdb)
 
-	if !headless {
+	if !cfg.headless {
 		logger.Info().Msg("Opening browser")
 		go func() {
 			waitForServer(serverURL)

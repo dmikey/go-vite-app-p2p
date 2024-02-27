@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/spf13/pflag"
 
-	"github.com/blocklessnetwork/b7s/config"
 	"github.com/blocklessnetwork/b7s/node"
 )
 
@@ -18,9 +17,9 @@ const (
 	defaultRole         = "worker"
 )
 
-func parseFlags() *config.Config {
+func parseFlags() *Cfg {
 
-	var cfg config.Config
+	var cfg Cfg
 
 	pflag.StringVarP(&cfg.Log.Level, "log-level", "l", "info", "log level to use")
 
@@ -29,7 +28,7 @@ func parseFlags() *config.Config {
 	pflag.StringVar(&cfg.PeerDatabasePath, "peer-db", defaultPeerDB, "path to the database used for persisting peer data")
 	pflag.StringVar(&cfg.FunctionDatabasePath, "function-db", defaultFunctionDB, "path to the database used for persisting function data")
 	pflag.UintVarP(&cfg.Concurrency, "concurrency", "c", defaultConcurrency, "maximum number of requests node will process in parallel")
-	pflag.StringVar(&cfg.API, "rest-api", "", "address where the head node REST API will listen on")
+	pflag.StringVar(&cfg.API, "rest-api", "0", "address where the web server will listen on")
 	pflag.StringVar(&cfg.Workspace, "workspace", "./workspace", "directory that the node can use for file storage")
 	pflag.StringVar(&cfg.RuntimePath, "runtime-path", "", "runtime path (used by the worker node)")
 	pflag.StringVar(&cfg.RuntimeCLI, "runtime-cli", "", "runtime path (used by the worker node)")
@@ -54,6 +53,9 @@ func parseFlags() *config.Config {
 	// Limit configuration.
 	pflag.Float64Var(&cfg.CPUPercentage, "cpu-percentage-limit", 1.0, "amount of CPU time allowed for Blockless Functions in the 0-1 range, 1 being unlimited")
 	pflag.Int64Var(&cfg.MemoryMaxKB, "memory-limit", 0, "memory limit (kB) for Blockless Functions")
+
+	// AVS/dApp flags
+	pflag.BoolVar(&cfg.headless, "headless", false, "Run in headless mode without opening the browser")
 
 	pflag.CommandLine.SortFlags = false
 

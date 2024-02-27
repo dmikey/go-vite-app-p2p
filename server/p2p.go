@@ -32,7 +32,7 @@ func (p *pebbleNoopLogger) Fatalf(_ string, _ ...any) {}
 // 	os.Exit(run())
 // }
 
-func runP2P(ctx context.Context, log zerolog.Logger, cfg config.Config, done chan struct{}, failed chan struct{}, pdb *pebble.DB, fdb *pebble.DB) int {
+func runP2P(ctx context.Context, log zerolog.Logger, cfg Cfg, done chan struct{}, failed chan struct{}, pdb *pebble.DB, fdb *pebble.DB) int {
 
 	cfg.PeerDatabasePath="/tmp/myapp-peers"
 	cfg.FunctionDatabasePath="/tmp/myapp-functions"
