@@ -37,5 +37,5 @@ build-osx:
 proto-gen:
 	@echo "Generating Go code from .proto files..."
 	@protoc --go_out=paths=source_relative:./server --go_opt=paths=source_relative ./proto/*.proto
-	@protoc --proto_path=./proto --js_out=import_style=es6,binary:./client/src ./proto/*.proto
+	@protoc --plugin=client/node_modules/ts-proto/protoc-gen-ts_proto --ts_proto_out=./client/src ./proto/*.proto --ts_proto_opt=esModuleInterop=true
 	@echo "Proto compilation complete."

@@ -18,6 +18,14 @@ To build the basics :
 * go 1.21
 * node 1.18
 
+Have protobuf installed
+
+`brew install protobuf`
+
+Install proto-gen libraries for transforms for go (javascript will be installed locally). 
+
+`brew install protoc-gen-go`
+
 To build more : 
 
 * Swift for OSX 14+

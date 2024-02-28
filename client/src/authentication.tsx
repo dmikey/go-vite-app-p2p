@@ -2,6 +2,9 @@ import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
+import { useRecoilValue } from "recoil";
+import { AppMeta } from "@/recoil/atoms";
+
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { UserAuthForm } from "@/components/ui/user-auth-form";
@@ -12,6 +15,7 @@ export const metadata: Metadata = {
 };
 
 export function AuthenticationPage() {
+	const appSettings = useRecoilValue(AppMeta);
 	return (
 		<>
 			<div className="md:hidden">
@@ -44,7 +48,7 @@ export function AuthenticationPage() {
 					<div className="absolute inset-0 bg-zinc-900" />
 					<div className="relative z-20 flex items-center text-lg font-medium">
 						<img src="/vite.svg" alt="myapp" width="38px" />
-						&nbsp;myapp
+						&nbsp;{appSettings.name}
 					</div>
 					<div className="relative z-20 mt-auto">
 						<blockquote className="space-y-2">

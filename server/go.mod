@@ -1,4 +1,4 @@
-module github.com/dmikey/go-vite-app/server
+module github.com/dmikey/go-vite-app-p2p/server
 
 go 1.21.0
 

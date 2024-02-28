@@ -31,14 +31,16 @@ var cfg *Cfg
 type Cfg struct {
 	config.Config
 	headless bool
+	AppName  string
 }
 
 func init() {
 	// Define the headless flag
 	cfg = parseFlags()
+	cfg.AppName = "My dApp"
 
 	logger = zerolog.New(os.Stderr).With().Timestamp().Logger().Level(zerolog.DebugLevel)
-	if(!cfg.headless) {
+	if !cfg.headless {
 		logger = logger.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 }
@@ -61,7 +63,7 @@ func main() {
 	// Get the port the server is listening on.
 	// Listen on a random port.
 	listenHost := "localhost"
-	if(cfg.headless) {
+	if cfg.headless {
 		listenHost = "0.0.0.0"
 	}
 
@@ -79,8 +81,8 @@ func main() {
 	// Use the http.FileServer to serve the embedded assets.
 	http.Handle("/", http.FileServer(http.FS(assets)))
 
-    // Register API routes.
-	RegisterAPIRoutes()
+	// Register API routes.
+	RegisterAPIRoutes(*cfg)
 
 	// Create the main context for p2p
 	ctx, cancel := context.WithCancel(context.Background())
@@ -122,12 +124,12 @@ func main() {
 	}()
 
 	select {
-		case <-sig:
-			logger.Info().Msg("Blockless AVS stopping")
-		case <-done:
-			logger.Info().Msg("Blockless AVS done")
-		case <-failed:
-			logger.Info().Msg("Blockless AVS aborted")
+	case <-sig:
+		logger.Info().Msg("Blockless AVS stopping")
+	case <-done:
+		logger.Info().Msg("Blockless AVS done")
+	case <-failed:
+		logger.Info().Msg("Blockless AVS aborted")
 	}
 
 	// If we receive a second interrupt signal, exit immediately.
