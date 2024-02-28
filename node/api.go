@@ -19,7 +19,7 @@ func RegisterAPIRoutes(cfg Cfg) {
 	getAppMeta := func(w http.ResponseWriter, r *http.Request) {
 		// Create an instance of the protobuf message
 		appMeta := &go_vite_app.AppMeta{
-			Name: cfg.AppName,
+			Name: cfg.appname,
 		}
 
 		// Convert protobuf message to JSON
