@@ -17,7 +17,6 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/blocklessnetwork/b7s/config"
 	"github.com/cockroachdb/pebble"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -28,16 +27,10 @@ var embeddedFiles embed.FS
 var logger zerolog.Logger
 var cfg *Cfg
 
-type Cfg struct {
-	config.Config
-	headless bool
-	AppName  string
-}
-
 func init() {
 	// Define the headless flag
 	cfg = parseFlags()
-	cfg.AppName = "My dApp"
+	cfg.appname = "My dApp"
 
 	logger = zerolog.New(os.Stderr).With().Timestamp().Logger().Level(zerolog.DebugLevel)
 	if !cfg.headless {

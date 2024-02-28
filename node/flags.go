@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/spf13/pflag"
 
+	"github.com/blocklessnetwork/b7s/config"
 	"github.com/blocklessnetwork/b7s/node"
 )
 
@@ -16,6 +17,14 @@ const (
 	defaultUseWebsocket = false
 	defaultRole         = "worker"
 )
+
+type Cfg struct {
+	config.Config
+
+	appname  string
+	devmode  bool
+	headless bool
+}
 
 func parseFlags() *Cfg {
 
@@ -56,6 +65,7 @@ func parseFlags() *Cfg {
 
 	// AVS/dApp flags
 	pflag.BoolVar(&cfg.headless, "headless", false, "Run in headless mode without opening the browser")
+	pflag.BoolVar(&cfg.devmode, "devmode", false, "Run in headless mode without opening the browser")
 
 	pflag.CommandLine.SortFlags = false
 

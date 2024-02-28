@@ -4,12 +4,12 @@ WORKDIR /
 COPY . .
 RUN make build-client
 
-# server build
+# node build
 from golang:1.21.7-bookworm as gobuilder
 WORKDIR /
 COPY . .
-COPY --from=nodebuilder /server/assets /server/assets
-RUN make build-server
+COPY --from=nodebuilder /node/assets /node/assets
+RUN make build-node
 
 # final image
 from debian:bookworm-slim
