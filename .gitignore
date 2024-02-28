@@ -4,3 +4,5 @@ myapp
 assets/
 build/
 __debug*
+function-db/
+peer-db/
